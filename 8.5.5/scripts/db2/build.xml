@@ -1,0 +1,26 @@
+<project name="generate-scripts" default="build" basedir=".">
+    <description>
+       creates DDL scripts from templates 
+    </description>
+  <!-- set global properties for this build -->
+  <property name="src" location="../../templates/db2"/>
+  <property name="build" location="target"/>
+
+  <target name="build" depends="clean">
+	<copy todir="${build}">
+    		<fileset dir="${src}">
+      			<exclude name="**/*.bat"/>
+    		</fileset>
+  	</copy>
+	<replace dir="${build}">
+  	<include name="createWsrr*.sql"/>
+  	<replacetoken><![CDATA[__DBNAME__]]></replacetoken>
+	<replacevalue><![CDATA[WSRRDB]]></replacevalue>
+	</replace>
+  </target>
+
+  <target name="clean"
+        description="clean up" >
+    <delete dir="${build}"/>
+  </target>
+</project>
