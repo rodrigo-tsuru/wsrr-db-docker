@@ -1,8 +1,7 @@
 <project name="generate-scripts" default="build" basedir=".">
     <description>
-       creates DDL scripts from templates 
+       creates DDL scripts from templates based on http://www-01.ibm.com/support/knowledgecenter/SSWLGF_8.5.5/com.ibm.sr.doc/twsr_edit_db2_scriptsR85.html
     </description>
-  <!-- set global properties for this build -->
   <property name="src" location="../../templates/db2"/>
   <property name="build" location="target"/>
 
@@ -12,11 +11,43 @@
       			<exclude name="**/*.bat"/>
     		</fileset>
   	</copy>
-	<replace dir="${build}">
-  	<include name="createWsrr*.sql"/>
-  	<replacetoken><![CDATA[__DBNAME__]]></replacetoken>
-	<replacevalue><![CDATA[WSRRDB]]></replacevalue>
+        <!-- 2a step -->
+        <replace file="${build}/createWsrrDb.sql">
+          <replacefilter token="-- db --" value=""/>
+          <replacefilter token="__DBNAME__" value="WSRRDB"/>
+        </replace>
+
+	<!-- 3a step -->
+	<replace file="${build}/createActDb.sql">
+          <replacefilter token="-- db --" value=""/>
+          <replacefilter token="__DBNAME__" value="ACTDB"/>
+        </replace>
+
+	<!-- 4a step -->
+        <replace file="${build}/createSibDb.sql">
+	  <replacefilter token="-- db --" value=""/>
+	  <replacefilter token="__DBNAME__" value="SIBDB"/>
+        </replace>
+
+        <!-- 5b step -->
+	<replace dir="${build}" includes="createWsrrTables1.sql,createWsrrTables2.sql,createWsrrProcs.sql">
+		<replacefilter token="__DBNAME__" value="WSRRDB"/>
+		<replacefilter token="__DBSCHEMA__" value="WSRR"/>
+		<replacefilter token="__DBUSER__" value="WSRRUSER"/>
 	</replace>
+
+        <!-- 6a step -->
+        <replace file="${build}/createActTables.sql">
+          <replacefilter token="__DBSCHEMA__" value="ACT"/>
+          <replacefilter token="__DBUSER__" value="WSRRUSER"/>
+        </replace>
+
+        <!-- 7a step -->
+        <replace file="${build}/createSibTables.sql">
+          <replacefilter token="__DBSCHEMA__" value="SIB"/>
+          <replacefilter token="__DBUSER__" value="WSRRUSER"/>
+        </replace>
+	
   </target>
 
   <target name="clean"
